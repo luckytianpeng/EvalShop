@@ -40,6 +40,10 @@ function _install_codegeex_rest_api_server {
     cp -f codegeex_rest_api_server/tests/*.py "$path/tests/"
     chmod +x "$path/scripts/codegeex_rest_api_server_launcher.sh"
     mkdir -p "$path/tests/logging"
+    # Write CodeGeeX_home into manage.properties
+    local escape_path=$( sed 's/\//\\\//g' <<< "$path" )
+    sed -i "s/^[#]*\s*CodeGeeX_home=.*/CodeGeeX_home=$escape_path/" \
+        manage.properties
 
     if (( 0 == $? )); then
 cat << EOF
