@@ -37,7 +37,7 @@ function _install_codegeex_rest_api_server {
     cp -rf codegeex_rest_api_server/scripts "$path"
     # Key user's config files (.json)
     cp -n codegeex_rest_api_server/tests/*.json "$path/tests/"
-    cp -n codegeex_rest_api_server/tests/*.py "$path/tests/"
+    cp -f codegeex_rest_api_server/tests/*.py "$path/tests/"
     chmod +x "$path/scripts/codegeex_rest_api_server_launcher.sh"
     mkdir -p "$path/tests/logging"
 
