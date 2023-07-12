@@ -1,0 +1,4 @@
+{
+    "server_address": ["", 8080],
+    "request_error_delay_time": 3
+}

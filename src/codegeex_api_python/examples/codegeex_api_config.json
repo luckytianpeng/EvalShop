@@ -1,0 +1,6 @@
+{
+  "api_base": "http://localhost:8080/v1",
+  "api_version": "2.1.0.0",
+  "api_type": "codegeex",
+  "api_key": "api_key here"
+}
