@@ -34,10 +34,10 @@ EOF
 
 function _install_codegeex_rest_api_server {
     local path=$( realpath $1 )
-    cp -rf ./src/codegeex_rest_api_server/scripts "$path"
+    cp -rf codegeex_rest_api_server/scripts "$path"
     # Key user's config files (.json)
-    cp -n ./src/codegeex_rest_api_server/tests/*.json "$path/tests/"
-    cp -n ./src/codegeex_rest_api_server/tests/*.py "$path/tests/"
+    cp -n codegeex_rest_api_server/tests/*.json "$path/tests/"
+    cp -n codegeex_rest_api_server/tests/*.py "$path/tests/"
     chmod +x "$path/scripts/codegeex_rest_api_server_launcher.sh"
     mkdir -p "$path/tests/logging"
 
