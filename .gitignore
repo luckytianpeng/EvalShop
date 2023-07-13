@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # For this project
-results/*.json
+results/*.jsonl
