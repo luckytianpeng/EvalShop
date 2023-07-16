@@ -1,0 +1,6 @@
+{
+  "api_base": "http://127.0.0.1:8088/v2",
+  "api_version": "2.1.0.0",
+  "api_type": "HumanEval-X-Evaluation",
+  "api_key": "api_key here"
+}

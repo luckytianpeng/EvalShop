@@ -1,0 +1,9 @@
+{
+    "server_address": ["", 8088],
+    "request_error_delay_time": 3,
+
+    "postprocess_code": true,
+    "sandbox_timeout": 60,
+    "testing_timeout": 8,
+    "sandbox_name": "humaneval_x_sandbox"
+}
