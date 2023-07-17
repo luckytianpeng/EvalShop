@@ -185,12 +185,12 @@ function install_humaneval_x_rest_api_server {
     # Ref:
     #     https://docker-py.readthedocs.io/en/stable/
 
-    pip3 show docker &> /dev/null
+    sudo pip3 show docker &> /dev/null
     local exit_status=$?
     if [ 0 != $exit_status ]; then
         echo "$PROGRAM install humaneval_x_rest_api_server: " \
             "Install the requirements file for Python ..."
-        pip3 install -r ./humaneval_x_rest_api_server/requirements.txt
+        sudo pip3 install -r ./humaneval_x_rest_api_server/requirements.txt
     fi
 
     # Build docker image (humaneval_x_sandbox)
