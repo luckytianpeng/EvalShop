@@ -12,7 +12,7 @@ import git
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 all_projects = json.load(open(
-      './all_projects_git_ssh_branch_commit_id_2023-06-11_02-07-40_596338-manual-commit_id_testing.json',
+      './projects.json',
       'r',
       encoding='utf-8'))
 

@@ -6,14 +6,12 @@ Ref:
 However, there is a bug in "virtualenv-api":
     subprocess.CalledProcessError: Command '<Popen: returncode: -11 args: ['bin/python', '-m', 'pip', '-V']>' died with <Signals.SIGSEGV: 11>.
 
-Note, if you need various Python versions:
+Ref:
+- https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
 
-    Run `sudo apt install python3-virtualenv` before use virtualenvapi.
+    python3 -m pip install --user virtualenv
 
     python3 -m venv env-manual
-
-    Ensure that your python version is in `pyenv versions`.
-
 """
 from typing import List
 from typing import Tuple
@@ -53,18 +51,12 @@ class VirtualEnvironment:
             stdout, stderr = process.communicate()
             result['stdout'] = stdout.decode()
             result['stderr'] = stderr.decode()
-            result['exit_code'] = 0
-            # print(f'stdout:\n{stdout.decode()}')
-            # print(f'stderr:\n{stderr.decode()}')
-            # Analyse stdout and stderr:
-            # ...
         except TimeoutExpired:
-            # print(traceback.format_exc(), file=sys.stderr)
-            # os.kill(process.pid, signal.SIGTERM)
             result['timeout'] = traceback.format_exc()
+            result['exit_code'] = 1
         except:
-            # print(traceback.format_exc(), file=sys.stderr)
             result['except'] = traceback.format_exc()
+            result['exit_code'] = 1
         finally:
             process.kill()
 
@@ -88,7 +80,7 @@ class VirtualEnvironment:
         else:
             command = f'{python} -m venv {venv_path}'
             result = VirtualEnvironment.__exec(command)
-            if result['stderr']:
+            if result['exit_code'] != 0:
                 self.is_available = False
             
 

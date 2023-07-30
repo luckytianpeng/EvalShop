@@ -112,7 +112,7 @@ function _install_dock {
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
     # Adding the Docker APT repository
-    sudo add-apt-repository \
+    sudo add-apt-repository -y \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) \
         stable"
@@ -223,7 +223,6 @@ EOF
 
 function install_codereval_rest_api_server {
     # Check if docker installed
-    # docker -v &> /dev/null
     sudo docker info &> /dev/null
     local exit_status=$?
     if [ 0 != $exit_status ]; then
@@ -255,7 +254,37 @@ function install_codereval_rest_api_server {
     if [ 0 != $exit_status ]; then
         echo "$PROGRAM install codereval_rest_api_server: " \
             "The automatic installation of pip is failed." \
-            "Please install python3-pip manually."
+            "Please install python3-pip manually." \
+            1>&2
+        exit $exit_status
+    fi
+
+    # virtualenv:
+    python3 -m venv -h &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM codereval_rest_api_server: " \
+            "Install the virtual environment ..."
+        # apt install -y python3-virtualenv    <-- does not work
+        # apt install python3.10-venv
+        # Python 3.10.6
+
+        # Ref: https://docs.python.org/3/library/sys.html#sys.version_info
+        # version number: major, minor
+        # local py_version_number=$( python3 --version | cut -d' ' -f2 )
+        # py_version_number=${py_version_number%.*}
+        # echo $py_version_number  # 3.10
+        # sudo apt install -y "python${py_version_number}-venv"
+        python3 -m pip install --user virtualenv
+    fi
+
+    python3 -m venv -h &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "The automatic installation of virtualenv is failed." \
+            "Please install python3-virtualenv manually." \
+            1>&2
         exit $exit_status
     fi
 
@@ -270,7 +299,7 @@ function install_codereval_rest_api_server {
     # Clone and checkout all projects
     echo "$PROGRAM install codereval_rest_api_server: " \
         "Clone and checkout all projects ..."
-    # python3 ./codereval_rest_api_server/projects_checkout.py
+    python3 ./codereval_rest_api_server/projects_checkout.py
     local exit_status=$?
     if [ 0 != $exit_status ]; then
         echo "Failure." 1>&2

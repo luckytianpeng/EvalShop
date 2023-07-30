@@ -17,7 +17,7 @@ TIMEOUT = 60 * 3
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 all_projects = json.load(open(
-      './all_projects_git_ssh_branch_commit_id_2023-06-11_02-07-40_596338-manual-commit_id_testing.json',
+      './projects.json',
       'r',
       encoding='utf-8'))
 
@@ -56,7 +56,7 @@ for project in all_projects:
     venv_name = 'env-auto'
     venv_path = os.path.join(project_local_dir, venv_name)
     # Clean
-    # shutil.rmtree(venv_path, ignore_errors=True)
+    shutil.rmtree(venv_path, ignore_errors=True)
 
     # Create the virtual environment if it does not exist:
     env = VirtualEnvironment(project_local_dir, 'python3', venv_name)
