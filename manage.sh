@@ -275,7 +275,7 @@ function install_codereval_rest_api_server {
     # Clone and checkout all projects
     echo "$PROGRAM install codereval_rest_api_server: " \
         "Clone and checkout all projects ..."
-    # python3 ./codereval_rest_api_server/projects_checkout.py
+    python3 ./codereval_rest_api_server/projects_checkout.py
     local exit_status=$?
     if [ 0 != $exit_status ]; then
         echo "Failure." 1>&2
