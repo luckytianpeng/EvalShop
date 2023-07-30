@@ -271,11 +271,11 @@ function install_codereval_rest_api_server {
 
         # Ref: https://docs.python.org/3/library/sys.html#sys.version_info
         # version number: major, minor
-        # local py_version_number=$( python3 --version | cut -d' ' -f2 )
-        # py_version_number=${py_version_number%.*}
+        local py_version_number=$( python3 --version | cut -d' ' -f2 )
+        py_version_number=${py_version_number%.*}
         # echo $py_version_number  # 3.10
-        # sudo apt install -y "python${py_version_number}-venv"
-        python3 -m pip install --user virtualenv
+        sudo apt install -y "python${py_version_number}-venv"
+        # python3 -m pip install --user virtualenv
     fi
 
     python3 -m venv -h &> /dev/null

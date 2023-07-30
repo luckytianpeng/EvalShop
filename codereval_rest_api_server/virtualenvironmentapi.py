@@ -12,6 +12,21 @@ Ref:
     python3 -m pip install --user virtualenv
 
     python3 -m venv env-manual
+
+
+$ python3 -m venv env-manual
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.10-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: ['github/EvalShop/codereval_rest_api_server/codereval_sandbox/github/commandline/flashbake/env-manual/bin/python3', '-Im', 'ensurepip', '--upgrade', '--default-pip']
+
+
 """
 from typing import List
 from typing import Tuple
