@@ -6,6 +6,7 @@ import shutil
 import traceback
 from subprocess import Popen, PIPE, TimeoutExpired
 import glob
+from pathlib import Path
 
 from virtualenvironmentapi import VirtualEnvironment
 
@@ -36,8 +37,9 @@ for project in all_projects:
           './codereval_sandbox/github/', project['project'])
     assert os.path.exists(project_local_dir)
 
-    requirements_files = glob.glob(
-          os.path.join(project_local_dir, '*requirements*.txt'))
+    requirements_files = [Path(path).name
+            for path in glob.glob(
+                os.path.join(project_local_dir, '*requirements*.txt'))]
     tox_ini_file = os.path.join(project_local_dir, 'tox.ini')
 
     packages = []
