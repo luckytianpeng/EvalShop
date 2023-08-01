@@ -3,7 +3,7 @@
 #_______________________________________________________________________________
 
 PROGRAM=${0##*/}
-VERSION="$PROGRAM version 1.0.0"
+VERSION="$PROGRAM version 1.5.0"
 
 
 function display_usage {
