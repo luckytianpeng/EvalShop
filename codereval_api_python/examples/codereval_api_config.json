@@ -1,0 +1,6 @@
+{
+  "api_base": "http://127.0.0.1:8001/v2",
+  "api_version": "1.0.0.0",
+  "api_type": "CoderEval",
+  "api_key": "api_key here"
+}

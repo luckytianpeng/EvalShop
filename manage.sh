@@ -3,7 +3,7 @@
 #_______________________________________________________________________________
 
 PROGRAM=${0##*/}
-VERSION="$PROGRAM version 1.0.0"
+VERSION="$PROGRAM version 1.5.0"
 
 
 function display_usage {
@@ -23,10 +23,12 @@ These are common manage commands used in various situations:
 install
     codegeex_rest_api_server --path CodeGeeX_local_home_path
     humaneval_x_rest_api_server (sudo)
+    codereval_rest_api_server
 
 runserver
     codegeex_rest_api_server
     humaneval_x_rest_api_server
+    codereval_rest_api_server
 
 E.g.:
     ./manage.sh install codegeex_rest_api_server --path ../CodeGeeX
@@ -34,6 +36,9 @@ E.g.:
 
     ./manage.sh install humaneval_x_rest_api_server
     ./manage.sh runserver humaneval_x_rest_api_server
+
+    ./manage.sh install codereval_rest_api_server
+    ./manage.sh runserver codereval_rest_api_server
 EOF
 }
 
@@ -107,7 +112,7 @@ function _install_dock {
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
     # Adding the Docker APT repository
-    sudo add-apt-repository \
+    sudo add-apt-repository -y \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) \
         stable"
@@ -216,6 +221,110 @@ EOF
     fi
 }
 
+function install_codereval_rest_api_server {
+    # Check if docker installed
+    sudo docker info &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "Install dock ..."
+        _install_dock
+    fi
+
+    sudo docker info &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "The automatic installation of the dock is failed." \
+            "Please install the dock manually - " \
+            "https://docs.docker.com/engine/install/" \
+            1>&2
+        exit $exit_status
+    fi
+
+    # Check if pip is installed
+    python3 -m pip --version &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        sudo apt install -y python3-pip
+    fi
+
+    python3 -m pip --version &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "The automatic installation of pip is failed." \
+            "Please install python3-pip manually." \
+            1>&2
+        exit $exit_status
+    fi
+
+    # virtualenv:
+    echo "$PROGRAM codereval_rest_api_server: " \
+        "Install the virtual environment ..."
+    sudo apt install -y python3-venv
+
+    sudo pip3 show GitPython &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM codereval_rest_api_server: " \
+            "Install the requirements file for Python ..."
+        sudo -H pip3 install -r ./codereval_rest_api_server/requirements.txt
+    fi
+
+    # Clone and checkout all projects
+    echo "$PROGRAM install codereval_rest_api_server: " \
+        "Clone and checkout all projects ..."
+    python3 ./codereval_rest_api_server/projects_checkout.py
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "Failure." 1>&2
+        exit $exit_status
+    fi
+
+    # Set up environments
+    echo "$PROGRAM install codereval_rest_api_server: " \
+        "Set up environments ..."
+    python3 ./codereval_rest_api_server/set_up_environments.py
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "Failure." 1>&2
+        exit $exit_status
+    fi
+
+    # Verify test entry points
+    echo "$PROGRAM install codereval_rest_api_server: " \
+        "Verify test entry points ..."
+    python3 ./codereval_rest_api_server/verify_test_entry_points.py
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "Failure." 1>&2
+        exit $exit_status
+    fi
+
+    # Build docker image (codereval_sandbox)
+    sudo docker image inspect codereval_sandbox &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "Build docker image (codereval_sandbox) ..."
+        sudo docker build --tag codereval_sandbox \
+            -f ./codereval_rest_api_server/codereval_sandbox/Dockerfile \
+            ./codereval_rest_api_server/codereval_sandbox
+    fi
+
+    if (( 0 == $? )); then
+cat << EOF
+Success.
+EOF
+    else
+cat >&2 << EOF
+Failure.
+EOF
+        exit 1
+    fi
+}
+
 function install {
     case $1 in
         'codegeex_rest_api_server' )
@@ -226,6 +335,10 @@ function install {
             shift
             install_humaneval_x_rest_api_server $@
             exit $?
+        ;;
+        'codereval_rest_api_server' )
+            shift
+            install_codereval_rest_api_server $@
         ;;
         '' )
             echo "$PROGRAM install: missing option" 1>&2
@@ -249,6 +362,10 @@ function run_humaneval_x_rest_api_server {
     sudo python3 ./humaneval_x_rest_api_server/humaneval_x_rest_api_server.py
 }
 
+function run_codereval_rest_api_server {
+    sudo python3 ./codereval_rest_api_server/codereval_rest_api_server.py
+}
+
 function runserver {
     case $1 in
         'codegeex_rest_api_server' )
@@ -258,6 +375,10 @@ function runserver {
         'humaneval_x_rest_api_server' )
             shift
             run_humaneval_x_rest_api_server $@
+        ;;
+        'codereval_rest_api_server' )
+            shift
+            run_codereval_rest_api_server $@
         ;;
         '' )
             echo "$PROGRAM runserver: missing option" 1>&2
