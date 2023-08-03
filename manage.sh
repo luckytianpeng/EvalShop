@@ -3,7 +3,7 @@
 #_______________________________________________________________________________
 
 PROGRAM=${0##*/}
-VERSION="$PROGRAM version 1.5.0"
+VERSION="$PROGRAM version 1.6.0"
 
 
 function display_usage {
@@ -124,6 +124,41 @@ function _install_dock {
     sudo apt-get install -y docker-ce
 }
 
+function _install_gVisor {
+    # Install from an apt repository
+    # Ref:  
+    # - https://gvisor.dev/docs/user_guide/install/
+
+    # First, appropriate dependencies must be installed to allow apt
+    # to install packages via https:
+    sudo apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg
+
+    # Next, configure the key used to sign archives and the repository:
+    curl -fsSL https://gvisor.dev/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) \
+        signed-by=/usr/share/keyrings/gvisor-archive-keyring.gpg] \
+        https://storage.googleapis.com/gvisor/releases release main" \
+        | sudo tee /etc/apt/sources.list.d/gvisor.list > /dev/null
+
+    # Now the runsc package can be installed:
+    sudo apt-get update && sudo apt-get install -y runsc
+
+    # Configuring Docker
+    # Ref:  
+    # - https://gvisor.dev/docs/user_guide/quick_start/docker/
+
+    # Configure Docker to use runsc by adding a runtime entry to your 
+    # Docker configuration:
+    sudo runsc install
+
+    # Must restart the Docker daemon after installing the runtime:
+    sudo systemctl restart docker
+}
+
 function is_codegeex_rest_api_server_installed {
     # Check if CodeGeeX_home exists
     . manage.properties
@@ -156,6 +191,26 @@ function install_humaneval_x_rest_api_server {
             "The automatic installation of the dock is failed." \
             "Please install the dock manually - " \
             "https://docs.docker.com/engine/install/" \
+            1>&2
+        exit $exit_status
+    fi
+
+    # Check if gVisor installed
+    sudo docker run --runtime=runsc -it ubuntu dmesg &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install humaneval_x_rest_api_server: " \
+            "Install gVisor ..."
+        _install_gVisor
+    fi
+
+    sudo docker run --runtime=runsc -it ubuntu dmesg &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install humaneval_x_rest_api_server: " \
+            "The automatic installation of gVisor is failed." \
+            "Please install the gVisor manually - " \
+            "https://gvisor.dev/docs/user_guide/install/" \
             1>&2
         exit $exit_status
     fi
@@ -238,6 +293,26 @@ function install_codereval_rest_api_server {
             "The automatic installation of the dock is failed." \
             "Please install the dock manually - " \
             "https://docs.docker.com/engine/install/" \
+            1>&2
+        exit $exit_status
+    fi
+
+    # Check if gVisor installed
+    sudo docker run --runtime=runsc -it ubuntu dmesg &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "Install gVisor ..."
+        _install_gVisor
+    fi
+
+    sudo docker run --runtime=runsc -it ubuntu dmesg &> /dev/null
+    local exit_status=$?
+    if [ 0 != $exit_status ]; then
+        echo "$PROGRAM install codereval_rest_api_server: " \
+            "The automatic installation of gVisor is failed." \
+            "Please install the gVisor manually - " \
+            "https://gvisor.dev/docs/user_guide/install/" \
             1>&2
         exit $exit_status
     fi

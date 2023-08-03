@@ -193,8 +193,10 @@ class CustomHandler(SimpleHTTPRequestHandler):
 
         docker_client = docker\
                 .APIClient(timeout=config['sandbox_timeout'])
-        docker_container = docker_client\
-                .create_container(config['sandbox_name'], stdin_open=True)
+        docker_container = docker_client.create_container(
+                image=config['sandbox_name'],
+                stdin_open=True,
+                runtime='runsc')
         docker_sock = docker_client\
                 .attach_socket(
                         docker_container,
